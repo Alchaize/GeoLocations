@@ -74,10 +74,6 @@ class DashboardFragment : Fragment() {
         dashboardViewModel.locationListLiveData.observe(viewLifecycleOwner
         ) { locations ->
             locations?.let {
-                Log.i(TAG, "Got locations, ${locations.size}")
-                for (x in locations) {
-                    Log.d(TAG, x.name)
-                }
                 updateUI(locations)
             }
         }
