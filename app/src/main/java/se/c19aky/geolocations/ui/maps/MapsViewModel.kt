@@ -1,13 +1,13 @@
-package se.c19aky.geolocations.ui.home
+package se.c19aky.geolocations.ui.maps
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class HomeViewModel : ViewModel() {
+class MapsViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
-        value = "This is home Fragment"
+        value = "This is maps Fragment"
     }
     val text: LiveData<String> = _text
 }
