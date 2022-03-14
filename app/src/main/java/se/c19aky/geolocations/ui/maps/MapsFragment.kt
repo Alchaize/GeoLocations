@@ -43,7 +43,7 @@ class MapsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        val homeViewModel =
+        val mapsViewModel =
             ViewModelProvider(this)[MapsViewModel::class.java]
 
         _binding = FragmentMapsBinding.inflate(inflater, container, false)
