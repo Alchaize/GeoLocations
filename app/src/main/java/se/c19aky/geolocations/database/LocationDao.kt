@@ -1,10 +1,7 @@
 package se.c19aky.geolocations.database
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import se.c19aky.geolocations.Location
 import java.util.*
 
@@ -22,4 +19,7 @@ interface LocationDao {
 
     @Insert
     fun addLocation(location: Location)
+
+    @Delete
+    fun deleteLocation(location: Location)
 }

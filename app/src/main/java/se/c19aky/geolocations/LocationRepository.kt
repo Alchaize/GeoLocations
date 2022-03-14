@@ -37,6 +37,12 @@ class LocationRepository private constructor(context: Context) {
         }
     }
 
+    fun deleteLocation(location: Location) {
+        executor.execute {
+            locationDao.deleteLocation(location)
+        }
+    }
+
     companion object {
         private var INSTANCE: LocationRepository? = null
 

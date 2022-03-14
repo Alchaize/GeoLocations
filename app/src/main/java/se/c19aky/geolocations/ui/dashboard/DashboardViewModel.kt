@@ -14,4 +14,8 @@ class DashboardViewModel : ViewModel() {
     fun addLocation(location: Location) {
         locationRepository.addLocation(location)
     }
+
+    fun removeLocation(location: Location) {
+        locationRepository.deleteLocation(location)
+    }
 }
