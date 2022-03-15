@@ -8,5 +8,5 @@ import java.util.*
 @Entity
 data class Location(@PrimaryKey val id: UUID = UUID.randomUUID(),
                     @ColumnInfo var name: String = "Location",
-                    @ColumnInfo var latitude: Int = 0,
-                    @ColumnInfo var longitude: Int = 0)
+                    @ColumnInfo var latitude: Double = 0.0,
+                    @ColumnInfo var longitude: Double = 0.0)

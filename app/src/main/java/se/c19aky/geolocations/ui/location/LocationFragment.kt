@@ -29,6 +29,8 @@ class LocationFragment : Fragment() {
     private val args : LocationFragmentArgs by navArgs()
     private lateinit var location: Location
     private lateinit var nameField: EditText
+    private lateinit var latitudeField: EditText
+    private lateinit var longitudeField: EditText
 
     private val locationViewModel: LocationViewModel by lazy {
         ViewModelProvider(this)[LocationViewModel::class.java]
@@ -38,20 +40,45 @@ class LocationFragment : Fragment() {
         super.onStart()
 
         val nameWatcher = object : TextWatcher {
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                // Blank
-            }
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 location.name = p0.toString()
             }
 
-            override fun afterTextChanged(p0: Editable?) {
-                // Blank
+            override fun afterTextChanged(p0: Editable?) {}
+        }
+
+        val latitudeWatcher = object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                val result = p0.toString()
+                if (result.isNotEmpty()) {
+                    location.latitude = result.toDouble()
+                }
             }
+
+            override fun afterTextChanged(p0: Editable?) {}
+        }
+
+        val longitudeWatcher = object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                val result = p0.toString()
+                if (result.isNotEmpty()) {
+                    location.longitude = result.toDouble()
+                }
+            }
+
+            override fun afterTextChanged(p0: Editable?) {}
         }
 
         nameField.addTextChangedListener(nameWatcher)
+        latitudeField.addTextChangedListener(latitudeWatcher)
+        longitudeField.addTextChangedListener(longitudeWatcher)
+
     }
 
     override fun onCreateView(
@@ -64,6 +91,8 @@ class LocationFragment : Fragment() {
         _binding = FragmentLocationBinding.inflate(inflater, container, false)
 
         nameField = binding.root.findViewById(R.id.text_location)
+        latitudeField = binding.root.findViewById(R.id.text_location_latitude)
+        longitudeField = binding.root.findViewById(R.id.text_location_longitude)
 
         return binding.root
     }
@@ -94,5 +123,7 @@ class LocationFragment : Fragment() {
 
     private fun updateUI() {
         nameField.setText(location.name)
+        latitudeField.setText(location.latitude.toString())
+        longitudeField.setText(location.longitude.toString())
     }
 }
