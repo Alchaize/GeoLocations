@@ -39,6 +39,7 @@ class LocationFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
+        // Watch the location name field
         val nameWatcher = object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
@@ -49,6 +50,7 @@ class LocationFragment : Fragment() {
             override fun afterTextChanged(p0: Editable?) {}
         }
 
+        // Watch the latitude field
         val latitudeWatcher = object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
@@ -62,6 +64,7 @@ class LocationFragment : Fragment() {
             override fun afterTextChanged(p0: Editable?) {}
         }
 
+        // Watch the longitude field
         val longitudeWatcher = object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
@@ -78,7 +81,6 @@ class LocationFragment : Fragment() {
         nameField.addTextChangedListener(nameWatcher)
         latitudeField.addTextChangedListener(latitudeWatcher)
         longitudeField.addTextChangedListener(longitudeWatcher)
-
     }
 
     override fun onCreateView(
