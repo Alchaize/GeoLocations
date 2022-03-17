@@ -11,10 +11,6 @@ class DashboardViewModel : ViewModel() {
     private val locationRepository = LocationRepository.get()
     val locationListLiveData = locationRepository.getLocations()
 
-    fun addLocation(location: Location) {
-        locationRepository.addLocation(location)
-    }
-
     fun removeLocation(location: Location) {
         locationRepository.deleteLocation(location)
     }

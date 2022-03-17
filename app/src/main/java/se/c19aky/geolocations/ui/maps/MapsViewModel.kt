@@ -1,13 +1,21 @@
 package se.c19aky.geolocations.ui.maps
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.android.gms.maps.model.LatLng
+import se.c19aky.geolocations.Location
+import se.c19aky.geolocations.LocationRepository
 
 class MapsViewModel : ViewModel() {
 
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is maps Fragment"
+    private val locationRepository = LocationRepository.get()
+    val locationListLiveData = locationRepository.getLocations()
+
+    val currentLocation: MutableLiveData<LatLng> by lazy {
+        MutableLiveData<LatLng>()
     }
-    val text: LiveData<String> = _text
+
+    fun addLocation(location: Location) {
+        locationRepository.addLocation(location)
+    }
 }

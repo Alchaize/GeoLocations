@@ -88,9 +88,6 @@ class DashboardFragment : Fragment() {
 
         return when(item.itemId) {
             R.id.new_location -> {
-                val location = Location()
-                dashboardViewModel.addLocation(location)
-                callbacks?.onLocationSelected(location.id)
                 true
             }
             else -> return super.onOptionsItemSelected(item)

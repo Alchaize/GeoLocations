@@ -9,7 +9,11 @@
         android:id="@+id/navigation_maps"
         android:name="se.c19aky.geolocations.ui.maps.MapsFragment"
         android:label="@string/title_map"
-        tools:layout="@layout/fragment_maps" />
+        tools:layout="@layout/fragment_maps" >
+        <action
+            android:id="@+id/action_navigation_maps_to_navigation_location"
+            app:destination="@id/navigation_location" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_dashboard"
