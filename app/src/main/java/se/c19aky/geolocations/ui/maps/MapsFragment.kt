@@ -14,6 +14,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import se.c19aky.geolocations.Location
 import se.c19aky.geolocations.R
@@ -51,25 +52,48 @@ class MapsFragment : Fragment() {
 
     private val mapCallback = OnMapReadyCallback { googleMap ->
 
-        mapsViewModel.locationListLiveData.observe(viewLifecycleOwner
-        ) { locations ->
-            locations?.let {
-                for (location in locations) {
-                    val pos = LatLng(location.latitude, location.longitude)
-                    googleMap.addMarker(MarkerOptions().position(pos).title(location.name))
+        mapsViewModel.currentLocation.observe(viewLifecycleOwner
+        ) { location ->
+            location?.let {
+                // Only zoom in the first time
+                if (mapsViewModel.initialZoomIn) {
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 8F))
+
+                    // There's no point in checking the above again
+                    mapsViewModel.currentLocation.removeObservers(viewLifecycleOwner)
+                    mapsViewModel.currentLocation.observe(viewLifecycleOwner)
+                    { location ->
+                        location?.let {
+                            mapsViewModel.redrawMarkers.value = true
+                        }
+                    }
                 }
             }
         }
 
-        mapsViewModel.currentLocation.observe(viewLifecycleOwner
-        ) { location ->
-            location?.let {
-                fusedLocationClient.removeLocationUpdates(locationCallback)
+        mapsViewModel.redrawMarkers.observe(viewLifecycleOwner) {
+            value ->
+            value?.let {
+                if (value) {
+                    mapsViewModel.redrawMarkers.value = false
+                    googleMap.clear()
 
-                googleMap.addMarker(MarkerOptions().position(location).title("Me"))
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 10F))
+                    // Draw current location
+                    mapsViewModel.currentLocation.value?.let { it1 ->
+                        MarkerOptions().position(
+                            it1
+                        ).title("Me")
+                    }?.let { it2 -> googleMap.addMarker(it2) }
+
+                    // Draw the locations in the database
+                    for (location in mapsViewModel.locations) {
+                        val pos = LatLng(location.latitude, location.longitude)
+                        googleMap.addMarker(MarkerOptions().position(pos).title(location.name))
+                    }
+                }
             }
         }
+
     }
 
     override fun onAttach(context: Context) {
@@ -84,8 +108,8 @@ class MapsFragment : Fragment() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this.requireActivity())
 
         locationRequest = LocationRequest.create().apply {
-            interval = 10000
-            fastestInterval = 5000
+            interval = 15000
+            fastestInterval = 7500
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
 
@@ -117,6 +141,15 @@ class MapsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(mapCallback)
+
+        mapsViewModel.locationListLiveData.observe(viewLifecycleOwner
+        ) { locations ->
+            locations?.let {
+                mapsViewModel.locations.clear()
+                mapsViewModel.locations.addAll(locations)
+                mapsViewModel.redrawMarkers.value = true
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
