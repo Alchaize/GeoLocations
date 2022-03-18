@@ -105,13 +105,13 @@ class MainActivity : AppCompatActivity(), DashboardFragment.Callbacks, MapsFragm
 
     override fun onLocationSelected(locationId: UUID) {
         val id = locationId.toString()
+        Log.d(TAG, "oh mama $locationId")
         val directions = DashboardFragmentDirections.actionNavigationDashboardToLocationFragment(id)
         navController.navigate(directions)
     }
 
     override fun newLocationCreated(locationId: UUID) {
         val id = locationId.toString()
-        Log.d(TAG, "oh mama")
         val directions = MapsFragmentDirections.actionNavigationMapsToNavigationLocation(id)
         navController.navigate(directions)
     }

@@ -26,4 +26,8 @@ class LocationViewModel : ViewModel() {
         locationRepository.updateLocation(location)
     }
 
+    fun removeLocation(location: Location) {
+        locationRepository.deleteLocation(location)
+    }
+
 }

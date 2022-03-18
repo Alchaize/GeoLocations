@@ -1,5 +1,6 @@
 package se.c19aky.geolocations.ui.location
 
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -7,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -31,6 +33,10 @@ class LocationFragment : Fragment() {
     private lateinit var nameField: EditText
     private lateinit var latitudeField: EditText
     private lateinit var longitudeField: EditText
+
+    private lateinit var deleteButton: Button
+
+    private var saveLocation = true
 
     private val locationViewModel: LocationViewModel by lazy {
         ViewModelProvider(this)[LocationViewModel::class.java]
@@ -95,6 +101,9 @@ class LocationFragment : Fragment() {
         nameField = binding.root.findViewById(R.id.text_location)
         latitudeField = binding.root.findViewById(R.id.text_location_latitude)
         longitudeField = binding.root.findViewById(R.id.text_location_longitude)
+        deleteButton = binding.root.findViewById(R.id.btn_delete)
+
+        setupDeleteButton()
 
         return binding.root
     }
@@ -120,12 +129,24 @@ class LocationFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        locationViewModel.saveLocation(location)
+        if (saveLocation) {
+            locationViewModel.saveLocation(location)
+        }
     }
 
     private fun updateUI() {
         nameField.setText(location.name)
         latitudeField.setText(location.latitude.toString())
         longitudeField.setText(location.longitude.toString())
+    }
+
+    private fun setupDeleteButton() {
+        deleteButton.setBackgroundColor(Color.RED)
+
+        deleteButton.setOnClickListener {
+            saveLocation = false
+            locationViewModel.removeLocation(location)
+            this.requireActivity().onBackPressed()
+        }
     }
 }

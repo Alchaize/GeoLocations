@@ -47,11 +47,6 @@ class DashboardFragment : Fragment() {
         callbacks = context as Callbacks?
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -77,22 +72,6 @@ class DashboardFragment : Fragment() {
                 updateUI(locations)
             }
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.fragment_location_list, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        return when(item.itemId) {
-            R.id.new_location -> {
-                true
-            }
-            else -> return super.onOptionsItemSelected(item)
-        }
-
     }
 
     override fun onDetach() {
@@ -125,7 +104,6 @@ class DashboardFragment : Fragment() {
         }
 
         override fun onClick(p0: View?) {
-            Toast.makeText(context, "${location.name} pressed!", Toast.LENGTH_SHORT).show()
             callbacks?.onLocationSelected(location.id)
         }
     }
