@@ -6,4 +6,6 @@
     <string name="title_settings">Settings</string>
     <string name="new_location">New Location</string>
     <string name="save_location">Save Location</string>
+    <string name="delete_all_locations">Delete all locations</string>
+    <string name="ask_for_location_permission">Ask for location permission</string>
 </resources>

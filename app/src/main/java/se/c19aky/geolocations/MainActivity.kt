@@ -39,10 +39,7 @@ class MainActivity : AppCompatActivity(), DashboardFragment.Callbacks, MapsFragm
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-
-    @RequiresApi(Build.VERSION_CODES.N)
     val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -62,30 +59,8 @@ class MainActivity : AppCompatActivity(), DashboardFragment.Callbacks, MapsFragm
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        askForLocationPermission()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            when {
-                ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED -> {
-                    // You can use the API that requires the permission.
-                }
-                shouldShowRequestPermissionRationale(permission.ACCESS_FINE_LOCATION) -> {
-                // In an educational UI, explain to the user why your app requires this
-                // permission for a specific feature to behave as expected. In this UI,
-                // include a "cancel" or "no thanks" button that allows the user to
-                // continue using your app without granting the permission.
-                // showInContextUI(...)
-            }
-                else -> {
-                    // You can directly ask for the permission.
-                    // The registered ActivityResultCallback gets the result of this request.
-                    locationPermissionRequest.launch(
-                        arrayOf(permission.ACCESS_COARSE_LOCATION,
-                            permission.ACCESS_FINE_LOCATION))
-                }
-            }
-        }
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -105,7 +80,6 @@ class MainActivity : AppCompatActivity(), DashboardFragment.Callbacks, MapsFragm
 
     override fun onLocationSelected(locationId: UUID) {
         val id = locationId.toString()
-        Log.d(TAG, "oh mama $locationId")
         val directions = DashboardFragmentDirections.actionNavigationDashboardToLocationFragment(id)
         navController.navigate(directions)
     }
@@ -114,6 +88,29 @@ class MainActivity : AppCompatActivity(), DashboardFragment.Callbacks, MapsFragm
         val id = locationId.toString()
         val directions = MapsFragmentDirections.actionNavigationMapsToNavigationLocation(id)
         navController.navigate(directions)
+    }
+
+    private fun askForLocationPermission() {
+        when {
+            ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                // You can use the API that requires the permission.
+            }
+            shouldShowRequestPermissionRationale(permission.ACCESS_FINE_LOCATION) -> {
+                // In an educational UI, explain to the user why your app requires this
+                // permission for a specific feature to behave as expected. In this UI,
+                // include a "cancel" or "no thanks" button that allows the user to
+                // continue using your app without granting the permission.
+                // showInContextUI(...)
+            }
+            else -> {
+                // You can directly ask for the permission.
+                // The registered ActivityResultCallback gets the result of this request.
+                locationPermissionRequest.launch(
+                    arrayOf(permission.ACCESS_COARSE_LOCATION,
+                        permission.ACCESS_FINE_LOCATION))
+            }
+        }
     }
 
 }
