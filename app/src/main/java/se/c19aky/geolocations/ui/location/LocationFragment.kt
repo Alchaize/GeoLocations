@@ -63,9 +63,10 @@ class LocationFragment : Fragment() {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                val result = p0.toString()
-                if (result.isNotEmpty()) {
-                    location.latitude = result.toDouble()
+                try {
+                    location.latitude = p0.toString().toDouble()
+                } catch (e: NumberFormatException) {
+                    // Don't update on invalid input
                 }
             }
 
@@ -77,24 +78,22 @@ class LocationFragment : Fragment() {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                val result = p0.toString()
-                if (result.isNotEmpty()) {
-                    location.longitude = result.toDouble()
+                try {
+                    location.longitude = p0.toString().toDouble()
+                } catch (e: NumberFormatException) {
+                    // Don't update on invalid input
                 }
             }
 
             override fun afterTextChanged(p0: Editable?) {}
         }
 
-        // Watch the longitude field
+        // Watch the description field
         val descriptionWatcher = object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                val result = p0.toString()
-                if (result.isNotEmpty()) {
-                    location.description = result
-                }
+                location.description = p0.toString()
             }
 
             override fun afterTextChanged(p0: Editable?) {}
