@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity(), DashboardFragment.Callbacks, MapsFragm
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
 
-    val locationPermissionRequest = registerForActivityResult(
+    private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         when {
