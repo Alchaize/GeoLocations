@@ -9,4 +9,5 @@ import java.util.*
 data class Location(@PrimaryKey val id: UUID = UUID.randomUUID(),
                     @ColumnInfo var name: String = "Location",
                     @ColumnInfo var latitude: Double = 0.0,
-                    @ColumnInfo var longitude: Double = 0.0)
+                    @ColumnInfo var longitude: Double = 0.0,
+                    @ColumnInfo var description: String = "Description")

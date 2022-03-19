@@ -33,6 +33,8 @@ class LocationFragment : Fragment() {
     private lateinit var nameField: EditText
     private lateinit var latitudeField: EditText
     private lateinit var longitudeField: EditText
+    private lateinit var descriptionField: EditText
+
 
     private lateinit var deleteButton: Button
 
@@ -84,9 +86,24 @@ class LocationFragment : Fragment() {
             override fun afterTextChanged(p0: Editable?) {}
         }
 
+        // Watch the longitude field
+        val descriptionWatcher = object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                val result = p0.toString()
+                if (result.isNotEmpty()) {
+                    location.description = result
+                }
+            }
+
+            override fun afterTextChanged(p0: Editable?) {}
+        }
+
         nameField.addTextChangedListener(nameWatcher)
         latitudeField.addTextChangedListener(latitudeWatcher)
         longitudeField.addTextChangedListener(longitudeWatcher)
+        descriptionField.addTextChangedListener(descriptionWatcher)
     }
 
     override fun onCreateView(
@@ -101,6 +118,7 @@ class LocationFragment : Fragment() {
         nameField = binding.root.findViewById(R.id.text_location)
         latitudeField = binding.root.findViewById(R.id.text_location_latitude)
         longitudeField = binding.root.findViewById(R.id.text_location_longitude)
+        descriptionField = binding.root.findViewById(R.id.text_location_description)
         deleteButton = binding.root.findViewById(R.id.btn_delete)
 
         setupDeleteButton()
@@ -138,6 +156,7 @@ class LocationFragment : Fragment() {
         nameField.setText(location.name)
         latitudeField.setText(location.latitude.toString())
         longitudeField.setText(location.longitude.toString())
+        descriptionField.setText(location.description)
     }
 
     private fun setupDeleteButton() {
