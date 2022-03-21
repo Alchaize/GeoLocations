@@ -9,6 +9,7 @@ import se.c19aky.geolocations.LocationRepository
 
 class MapsViewModel : ViewModel() {
 
+    var locationPermissionGiven = false
     var initialZoomIn: Boolean = true
     private val locationRepository = LocationRepository.get()
     val locationListLiveData = locationRepository.getLocations()

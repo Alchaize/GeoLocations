@@ -8,17 +8,11 @@
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/btn_ask_permissions"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:text="@string/ask_for_location_permission"/>
-
-    <Button
         android:id="@+id/btn_delete_all_locations"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
+        android:layout_margin="8dp"
         android:text="@string/delete_all_locations"/>
 
 </LinearLayout>

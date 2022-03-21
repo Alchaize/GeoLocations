@@ -87,6 +87,7 @@ class DashboardFragment : Fragment() {
     private fun updateUI(locations: List<Location>) {
         adapter = LocationAdapter(locations)
         locationRecyclerView.adapter = adapter
+        Toast.makeText(this.requireContext(), "Go to map to create some locations!", Toast.LENGTH_LONG).show()
     }
 
     private inner class LocationHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {

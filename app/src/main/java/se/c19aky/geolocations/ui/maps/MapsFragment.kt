@@ -32,6 +32,7 @@ class MapsFragment : Fragment() {
      */
     interface Callbacks {
         fun newLocationCreated(locationId: UUID)
+        fun isLocationPermissionGiven(): Boolean
     }
 
     private var callbacks: Callbacks? = null
@@ -52,24 +53,27 @@ class MapsFragment : Fragment() {
 
     private val mapCallback = OnMapReadyCallback { googleMap ->
 
-        mapsViewModel.currentLocation.observe(viewLifecycleOwner
-        ) { location ->
-            location?.let {
-                // Only zoom in the first time
-                if (mapsViewModel.initialZoomIn) {
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 8F))
+        if (mapsViewModel.locationPermissionGiven) {
+            mapsViewModel.currentLocation.observe(viewLifecycleOwner
+            ) { location ->
+                location?.let {
+                    // Only zoom in the first time
+                    if (mapsViewModel.initialZoomIn) {
+                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 8F))
 
-                    // There's no point in checking the above again
-                    mapsViewModel.currentLocation.removeObservers(viewLifecycleOwner)
-                    mapsViewModel.currentLocation.observe(viewLifecycleOwner)
-                    { location ->
-                        location?.let {
-                            mapsViewModel.redrawMarkers.value = true
+                        // There's no point in checking the above again
+                        mapsViewModel.currentLocation.removeObservers(viewLifecycleOwner)
+                        mapsViewModel.currentLocation.observe(viewLifecycleOwner)
+                        { location ->
+                            location?.let {
+                                mapsViewModel.redrawMarkers.value = true
+                            }
                         }
                     }
                 }
             }
         }
+
 
         mapsViewModel.redrawMarkers.observe(viewLifecycleOwner) {
             value ->
@@ -79,11 +83,11 @@ class MapsFragment : Fragment() {
                     googleMap.clear()
 
                     // Draw current location
-                    mapsViewModel.currentLocation.value?.let { it1 ->
-                        MarkerOptions().position(
-                            it1
-                        ).title("Me")
-                    }?.let { it2 -> googleMap.addMarker(it2) }
+                    if (mapsViewModel.locationPermissionGiven) {
+                        mapsViewModel.currentLocation.value?.let { it1 ->
+                            MarkerOptions().position(it1).title("Me")
+                        }?.let { it2 -> googleMap.addMarker(it2) }
+                    }
 
                     // Draw the locations in the database
                     for (location in mapsViewModel.locations) {
@@ -101,27 +105,8 @@ class MapsFragment : Fragment() {
         callbacks = context as Callbacks?
     }
 
-    @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this.requireActivity())
-
-        locationRequest = LocationRequest.create().apply {
-            interval = 15000
-            fastestInterval = 7500
-            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-        }
-
-        locationCallback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult) {
-                for (location in locationResult.locations){
-                    mapsViewModel.currentLocation.value = LatLng(location.latitude, location.longitude)
-                }
-            }
-        }
-
-        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
 
         setHasOptionsMenu(true)
     }
@@ -133,6 +118,12 @@ class MapsFragment : Fragment() {
     ): View {
 
         _binding = FragmentMapsBinding.inflate(inflater, container, false)
+
+        if (callbacks?.isLocationPermissionGiven() == true) {
+            mapsViewModel.locationPermissionGiven = true
+
+            subscribeToLocationUpdates()
+        }
 
         return binding.root
     }
@@ -162,15 +153,19 @@ class MapsFragment : Fragment() {
         return when(item.itemId) {
             R.id.save_location -> {
 
+                // Create new location
                 val location = Location()
                 mapsViewModel.addLocation(location)
 
-                mapsViewModel.currentLocation.observe(viewLifecycleOwner
-                ) { currentLocation ->
-                    currentLocation.let {
-                        location.latitude = currentLocation.latitude
-                        location.longitude = currentLocation.longitude
-                        mapsViewModel.currentLocation.removeObservers(viewLifecycleOwner)
+                // Use current location if possible
+                if (mapsViewModel.locationPermissionGiven) {
+                    mapsViewModel.currentLocation.observe(viewLifecycleOwner
+                    ) { currentLocation ->
+                        currentLocation.let {
+                            location.latitude = currentLocation.latitude
+                            location.longitude = currentLocation.longitude
+                            mapsViewModel.currentLocation.removeObservers(viewLifecycleOwner)
+                        }
                     }
                 }
 
@@ -190,5 +185,31 @@ class MapsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun subscribeToLocationUpdates() {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this.requireActivity())
+        locationRequest = createLocationRequest()
+        locationCallback = createLocationCallback()
+
+        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+    }
+
+    private fun createLocationRequest(): LocationRequest {
+        return LocationRequest.create().apply {
+            interval = 10000
+            fastestInterval = 5000
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+    }
+
+    private fun createLocationCallback(): LocationCallback {
+        return object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                val location = locationResult.lastLocation
+                mapsViewModel.currentLocation.value = LatLng(location.latitude, location.longitude)
+            }
+        }
     }
 }

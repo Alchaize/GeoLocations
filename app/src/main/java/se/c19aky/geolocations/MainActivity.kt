@@ -25,6 +25,7 @@ import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.snackbar.Snackbar
 import se.c19aky.geolocations.databinding.ActivityMainBinding
 import se.c19aky.geolocations.ui.dashboard.DashboardFragment
 import se.c19aky.geolocations.ui.dashboard.DashboardFragmentDirections
@@ -51,15 +52,17 @@ class MainActivity : AppCompatActivity(), DashboardFragment.Callbacks, MapsFragm
                 // Only approximate location access granted.
             } else -> {
             // No location access granted.
-        }
+            Snackbar.make(this.binding.container, "Location permission makes creating locations easier", Snackbar.LENGTH_INDEFINITE)
+                .setAction("No thanks"){
+                    Snackbar.make(this.binding.container, "Ok", Snackbar.LENGTH_SHORT).show()
+                }.show()
+            }
         }
     }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        askForLocationPermission()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -76,39 +79,48 @@ class MainActivity : AppCompatActivity(), DashboardFragment.Callbacks, MapsFragm
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        askForLocationPermission()
     }
 
+    /**
+     * Move user to location fragment when they select a location
+     */
     override fun onLocationSelected(locationId: UUID) {
         val id = locationId.toString()
         val directions = DashboardFragmentDirections.actionNavigationDashboardToLocationFragment(id)
         navController.navigate(directions)
     }
 
+    /**
+     * Move user to location fragment when they create a new location
+     */
     override fun newLocationCreated(locationId: UUID) {
         val id = locationId.toString()
         val directions = MapsFragmentDirections.actionNavigationMapsToNavigationLocation(id)
         navController.navigate(directions)
     }
 
+    /**
+     * Check if location permission is given
+     */
+    override fun isLocationPermissionGiven(): Boolean {
+        return ContextCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
     private fun askForLocationPermission() {
-        when {
-            ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED -> {
+        when (PackageManager.PERMISSION_GRANTED) {
+            ContextCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION
+            ) -> {
                 // You can use the API that requires the permission.
-            }
-            shouldShowRequestPermissionRationale(permission.ACCESS_FINE_LOCATION) -> {
-                // In an educational UI, explain to the user why your app requires this
-                // permission for a specific feature to behave as expected. In this UI,
-                // include a "cancel" or "no thanks" button that allows the user to
-                // continue using your app without granting the permission.
-                // showInContextUI(...)
             }
             else -> {
                 // You can directly ask for the permission.
                 // The registered ActivityResultCallback gets the result of this request.
                 locationPermissionRequest.launch(
-                    arrayOf(permission.ACCESS_COARSE_LOCATION,
-                        permission.ACCESS_FINE_LOCATION))
+                    arrayOf(permission.ACCESS_FINE_LOCATION,
+                        permission.ACCESS_COARSE_LOCATION))
             }
         }
     }
