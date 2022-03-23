@@ -57,17 +57,15 @@ class MapsFragment : Fragment() {
             mapsViewModel.currentLocation.observe(viewLifecycleOwner
             ) { location ->
                 location?.let {
-                    // Only zoom in the first time
-                    if (mapsViewModel.initialZoomIn) {
-                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 8F))
+                    // Zoom in on the user
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 8F))
 
-                        // There's no point in checking the above again
-                        mapsViewModel.currentLocation.removeObservers(viewLifecycleOwner)
-                        mapsViewModel.currentLocation.observe(viewLifecycleOwner)
-                        { location ->
-                            location?.let {
-                                mapsViewModel.redrawMarkers.value = true
-                            }
+                    // We don't want to zoom in again every time the current location is updated
+                    mapsViewModel.currentLocation.removeObservers(viewLifecycleOwner)
+                    mapsViewModel.currentLocation.observe(viewLifecycleOwner)
+                    { location ->
+                        location?.let {
+                            mapsViewModel.redrawMarkers.value = true
                         }
                     }
                 }

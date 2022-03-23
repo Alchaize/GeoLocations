@@ -105,13 +105,13 @@ class MainActivity : AppCompatActivity(), DashboardFragment.Callbacks, MapsFragm
      * Check if location permission is given
      */
     override fun isLocationPermissionGiven(): Boolean {
-        return ContextCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION
+        return ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun askForLocationPermission() {
         when (PackageManager.PERMISSION_GRANTED) {
-            ContextCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION
+            ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION
             ) -> {
                 // You can use the API that requires the permission.
             }

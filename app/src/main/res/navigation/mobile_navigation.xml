@@ -39,12 +39,6 @@
         <argument
             android:name="id"
             app:argType="string" />
-        <action
-            android:id="@+id/action_navigation_location_to_navigation_dashboard"
-            app:destination="@id/navigation_dashboard" />
-        <action
-            android:id="@+id/action_navigation_location_to_navigation_maps"
-            app:destination="@id/navigation_maps" />
     </fragment>
 
 </navigation>
