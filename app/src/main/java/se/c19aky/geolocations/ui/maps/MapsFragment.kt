@@ -4,27 +4,25 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.os.Looper
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import se.c19aky.geolocations.Location
 import se.c19aky.geolocations.R
 import se.c19aky.geolocations.databinding.FragmentMapsBinding
-import se.c19aky.geolocations.ui.dashboard.DashboardFragment
-import se.c19aky.geolocations.ui.dashboard.DashboardViewModel
 import java.util.*
 
 private const val TAG = "MapsFragment"
 
+/**
+ * Fragment for viewing a map containing locations in the database and potentially the user as well.
+ */
 class MapsFragment : Fragment() {
 
     /**
@@ -47,12 +45,17 @@ class MapsFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    // Get ViewModel
     private val mapsViewModel: MapsViewModel by lazy {
         ViewModelProvider(this)[MapsViewModel::class.java]
     }
 
+    /**
+     * Callback for when the map is ready and markers can be added to it.
+     */
     private val mapCallback = OnMapReadyCallback { googleMap ->
 
+        // Only draw marker on current location if the user has accepted it
         if (mapsViewModel.locationPermissionGiven) {
             mapsViewModel.currentLocation.observe(viewLifecycleOwner
             ) { location ->
@@ -60,7 +63,7 @@ class MapsFragment : Fragment() {
                     // Zoom in on the user
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 8F))
 
-                    // We don't want to zoom in again every time the current location is updated
+                    // Avoid zooming in again every time the current location is updated
                     mapsViewModel.currentLocation.removeObservers(viewLifecycleOwner)
                     mapsViewModel.currentLocation.observe(viewLifecycleOwner)
                     { location ->
@@ -72,7 +75,7 @@ class MapsFragment : Fragment() {
             }
         }
 
-
+        // Redraw markers when new ones have been added
         mapsViewModel.redrawMarkers.observe(viewLifecycleOwner) {
             value ->
             value?.let {
@@ -80,7 +83,7 @@ class MapsFragment : Fragment() {
                     mapsViewModel.redrawMarkers.value = false
                     googleMap.clear()
 
-                    // Draw current location
+                    // Draw current location if allowed
                     if (mapsViewModel.locationPermissionGiven) {
                         mapsViewModel.currentLocation.value?.let { it1 ->
                             MarkerOptions().position(it1).title("Me")
@@ -95,7 +98,6 @@ class MapsFragment : Fragment() {
                 }
             }
         }
-
     }
 
     override fun onAttach(context: Context) {
@@ -109,6 +111,10 @@ class MapsFragment : Fragment() {
         setHasOptionsMenu(true)
     }
 
+    /**
+     * Check if location permission is given.
+     * If it is, start subscribing to location updates
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -126,6 +132,9 @@ class MapsFragment : Fragment() {
         return binding.root
     }
 
+    /**
+     * Get map fragment, set its callback method, start to observe the data from the database
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
@@ -141,11 +150,17 @@ class MapsFragment : Fragment() {
         }
     }
 
+    /**
+     * Inflate menu containing button to add a new location
+     */
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.fragment_map, menu)
     }
 
+    /**
+     * Create new location when the new location button is pressed
+     */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         return when(item.itemId) {
@@ -185,15 +200,22 @@ class MapsFragment : Fragment() {
         _binding = null
     }
 
+    /**
+     * Start to subscribe to location updates
+     */
     @SuppressLint("MissingPermission")
     private fun subscribeToLocationUpdates() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this.requireActivity())
+
         locationRequest = createLocationRequest()
         locationCallback = createLocationCallback()
 
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
     }
 
+    /**
+     * Create location request
+     */
     private fun createLocationRequest(): LocationRequest {
         return LocationRequest.create().apply {
             interval = 10000
@@ -202,6 +224,9 @@ class MapsFragment : Fragment() {
         }
     }
 
+    /**
+     * Create location callback, updating the current location stored in the ViewModel
+     */
     private fun createLocationCallback(): LocationCallback {
         return object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {

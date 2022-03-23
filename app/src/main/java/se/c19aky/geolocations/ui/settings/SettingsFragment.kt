@@ -20,6 +20,9 @@ import se.c19aky.geolocations.databinding.FragmentSettingsBinding
 
 private const val TAG = "SettingsFragment"
 
+/**
+ * Fragment for viewing the settings, which currently is just a single button
+ */
 class SettingsFragment : Fragment() {
     private var _binding: FragmentSettingsBinding? = null
 
@@ -29,6 +32,9 @@ class SettingsFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    /**
+     * Setup the delete all locations button
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

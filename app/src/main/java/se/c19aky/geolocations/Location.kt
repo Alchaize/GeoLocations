@@ -5,6 +5,9 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.util.*
 
+/**
+ * Model class representing a location
+ */
 @Entity
 data class Location(@PrimaryKey val id: UUID = UUID.randomUUID(),
                     @ColumnInfo var name: String = "Location",

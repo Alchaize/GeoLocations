@@ -1,25 +1,24 @@
-package se.c19aky.geolocations.ui.dashboard
+package se.c19aky.geolocations.ui.list
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import se.c19aky.geolocations.Location
 import se.c19aky.geolocations.R
-import se.c19aky.geolocations.databinding.FragmentDashboardBinding
+import se.c19aky.geolocations.databinding.FragmentListBinding
 import java.util.*
 
-private const val TAG = "DashboardFragment"
+private const val TAG = "ListFragment"
 
-class DashboardFragment : Fragment() {
+/**
+ * Fragment for looking at all locations in a long list, with each entry being clickable
+ */
+class ListFragment : Fragment() {
 
     /**
      * Required interface for hosting activities
@@ -30,12 +29,13 @@ class DashboardFragment : Fragment() {
 
     private var callbacks: Callbacks? = null
 
-    private var _binding: FragmentDashboardBinding? = null
+    private var _binding: FragmentListBinding? = null
     private lateinit var locationRecyclerView: RecyclerView
     private var adapter: LocationAdapter? = LocationAdapter(emptyList())
 
-    private val dashboardViewModel: DashboardViewModel by lazy {
-        ViewModelProvider(this)[DashboardViewModel::class.java]
+    // Get ViewModel
+    private val listViewModel: ListViewModel by lazy {
+        ViewModelProvider(this)[ListViewModel::class.java]
     }
 
     // This property is only valid between onCreateView and
@@ -47,13 +47,16 @@ class DashboardFragment : Fragment() {
         callbacks = context as Callbacks?
     }
 
+    /**
+     * Get components in layout
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
 
-        _binding = FragmentDashboardBinding.inflate(inflater, container, false)
+        _binding = FragmentListBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         locationRecyclerView = root as RecyclerView
@@ -63,10 +66,13 @@ class DashboardFragment : Fragment() {
         return root
     }
 
+    /**
+     * Start to observe the livedata in ViewModel to update UI when it has changed
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        dashboardViewModel.locationListLiveData.observe(viewLifecycleOwner
+        listViewModel.locationListLiveData.observe(viewLifecycleOwner
         ) { locations ->
             locations?.let {
                 updateUI(locations)
@@ -84,6 +90,9 @@ class DashboardFragment : Fragment() {
         _binding = null
     }
 
+    /**
+     * Update the UI, i.e. the list of locations
+     */
     private fun updateUI(locations: List<Location>) {
         adapter = LocationAdapter(locations)
         locationRecyclerView.adapter = adapter

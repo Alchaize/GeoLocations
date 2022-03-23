@@ -20,6 +20,9 @@ import java.util.*
 
 private const val TAG = "LocationFragment"
 
+/**
+ * Fragment for viewing a single location
+ */
 class LocationFragment : Fragment() {
 
     private var _binding: FragmentLocationBinding? = null
@@ -40,10 +43,14 @@ class LocationFragment : Fragment() {
 
     private var saveLocation = true
 
+    // Get ViewModel
     private val locationViewModel: LocationViewModel by lazy {
         ViewModelProvider(this)[LocationViewModel::class.java]
     }
 
+    /**
+     * Create text watchers for each EditText
+     */
     override fun onStart() {
         super.onStart()
 
@@ -105,6 +112,9 @@ class LocationFragment : Fragment() {
         descriptionField.addTextChangedListener(descriptionWatcher)
     }
 
+    /**
+     * Get each component
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -114,17 +124,20 @@ class LocationFragment : Fragment() {
 
         _binding = FragmentLocationBinding.inflate(inflater, container, false)
 
-        nameField = binding.root.findViewById(R.id.text_location)
-        latitudeField = binding.root.findViewById(R.id.text_location_latitude)
-        longitudeField = binding.root.findViewById(R.id.text_location_longitude)
-        descriptionField = binding.root.findViewById(R.id.text_location_description)
-        deleteButton = binding.root.findViewById(R.id.btn_delete)
+        nameField = binding.textLocation
+        latitudeField = binding.textLocationLatitude
+        longitudeField = binding.textLocationLongitude
+        descriptionField = binding.textLocationDescription
+        deleteButton = binding.btnDelete
 
         setupDeleteButton()
 
         return binding.root
     }
 
+    /**
+     * Load the data of the location given by the args when starting this fragment
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -144,6 +157,9 @@ class LocationFragment : Fragment() {
         _binding = null
     }
 
+    /**
+     * Update location data before leaving unless the location is to be deleted if the location
+     */
     override fun onStop() {
         super.onStop()
         if (saveLocation) {
@@ -151,6 +167,9 @@ class LocationFragment : Fragment() {
         }
     }
 
+    /**
+     * Update the information in each text field
+     */
     private fun updateUI() {
         nameField.setText(location.name)
         latitudeField.setText(location.latitude.toString())
@@ -158,6 +177,9 @@ class LocationFragment : Fragment() {
         descriptionField.setText(location.description)
     }
 
+    /**
+     * Setup the delete button
+     */
     private fun setupDeleteButton() {
         deleteButton.setBackgroundColor(Color.RED)
 

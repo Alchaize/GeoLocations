@@ -5,6 +5,9 @@ import androidx.room.*
 import se.c19aky.geolocations.Location
 import java.util.*
 
+/**
+ * Data access object for accessing the database from the application
+ */
 @Dao
 interface LocationDao {
 

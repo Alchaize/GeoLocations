@@ -1,34 +1,21 @@
 package se.c19aky.geolocations
 
-import android.Manifest
 import android.Manifest.permission
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.tasks.CancellationToken
-import com.google.android.gms.tasks.CancellationTokenSource
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import se.c19aky.geolocations.databinding.ActivityMainBinding
-import se.c19aky.geolocations.ui.dashboard.DashboardFragment
-import se.c19aky.geolocations.ui.dashboard.DashboardFragmentDirections
+import se.c19aky.geolocations.ui.list.ListFragment
+import se.c19aky.geolocations.ui.list.ListFragmentDirections
 import se.c19aky.geolocations.ui.maps.MapsFragment
 import se.c19aky.geolocations.ui.maps.MapsFragmentDirections
 import java.util.*
@@ -36,10 +23,15 @@ import java.util.*
 
 private const val TAG = "MainActivity"
 
-class MainActivity : AppCompatActivity(), DashboardFragment.Callbacks, MapsFragment.Callbacks {
+/**
+ * MainActivity
+ * Switches between the fragments, controls the navbar and asks for location permission.
+ */
+class MainActivity : AppCompatActivity(), ListFragment.Callbacks, MapsFragment.Callbacks {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
+
 
     private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -61,6 +53,9 @@ class MainActivity : AppCompatActivity(), DashboardFragment.Callbacks, MapsFragm
     }
 
 
+    /**
+     * Create main activity
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -74,7 +69,7 @@ class MainActivity : AppCompatActivity(), DashboardFragment.Callbacks, MapsFragm
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_maps, R.id.navigation_dashboard, R.id.navigation_settings
+                R.id.navigation_maps, R.id.navigation_list, R.id.navigation_settings
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -88,7 +83,7 @@ class MainActivity : AppCompatActivity(), DashboardFragment.Callbacks, MapsFragm
      */
     override fun onLocationSelected(locationId: UUID) {
         val id = locationId.toString()
-        val directions = DashboardFragmentDirections.actionNavigationDashboardToLocationFragment(id)
+        val directions = ListFragmentDirections.actionNavigationListToNavigationLocation(id)
         navController.navigate(directions)
     }
 
@@ -109,6 +104,9 @@ class MainActivity : AppCompatActivity(), DashboardFragment.Callbacks, MapsFragm
         ) == PackageManager.PERMISSION_GRANTED
     }
 
+    /**
+     * Ask user for permission to use the location of the phone
+     */
     private fun askForLocationPermission() {
         when (PackageManager.PERMISSION_GRANTED) {
             ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION
